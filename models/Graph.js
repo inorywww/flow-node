@@ -19,9 +19,17 @@ const GraphSchema = new Schema({
     type: String,
     default: '未命名文件'
   },
+  is_del: { // 是否删除 0：未删除 1: 假删除
+    type: Number,
+    default: 0, 
+  },
   info: {
     type: String,
     default: ''
+  },
+  img: {
+    type: String,
+    default: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAAXNSR0IArs4c6QAAAPtJREFUeF7t0rENAAAMwrDy/9M9wmvYs1jsGgmM6uILEE8QYIAogHkPDBAFMO+BAaIA5j0wQBTAvAcGiAKY98AAUQDzHhggCmDeAwNEAcx7YIAogHkPDBAFMO+BAaIA5j0wQBTAvAcGiAKY98AAUQDzHhggCmDeAwNEAcx7YIAogHkPDBAFMO+BAaIA5j0wQBTAvAcGiAKY98AAUQDzHhggCmDeAwNEAcx7YIAogHkPDBAFMO+BAaIA5j0wQBTAvAcGiAKY98AAUQDzHhggCmDeAwNEAcx7YIAogHkPDBAFMO+BAaIA5j0wQBTAvAcGiAKY98AAUQDzHoiAD0PoAFE/HRk+AAAAAElFTkSuQmCC'
   }
 });
 

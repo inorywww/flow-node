@@ -8,13 +8,9 @@ const keys = require("../../config/keys");
 const passport = require("passport");
 
 const User = require("../../models/User");
+const { randomCode, sendCode } = require("../../utils/getMessage");
 
-router.post('/testPost',(req, res) => {
-    const account = req.body.account;
-    const password = req.body.password;
-    res.json(req.body);
-})
-
+const auths = [] // 存放注册时的验证信息
 // login api
 // $route POST api/users/login
 // @desc 返回token jwt passport
@@ -23,65 +19,47 @@ router.post("/login", (req, res) => {
     const password = req.body.password;
     
     // 查询数据库
-    User.findOne({ account })
-        .then(user => {
-            if (!user) {
-                return res.status(400).json("用户不存在！");
-            } else {
-                const pwdMatchFlag = bcrypt.compareSync(user.password, password);
-                if (pwdMatchFlag) {
-                    const rule = {
-                        id: user.id,
-                        account: user.account
+    User.findOne({ account }).then(user => {
+        if (!user) {
+            return res.status(400).json("用户不存在！");
+        } else {
+            if (user.password == password) {
+                const rule = {
+                    id: user.id,
+                    account: user.account
+                };
+                jwt.sign(rule, keys.secretOrKey, { expiresIn: 36000 }, (err, token) => {
+                    if (err) {
+                        console.log(err);
                     };
-                    jwt.sign(rule, keys.secretOrKey, {
-                        expiresIn: 3600
-                    }, (err, token) => {
-                        if (err) {
-                            console.log(err);
-                        };
-                        res.json({
-                            success: true,
-                            token: "Bearer " + token
-                        })
+                    res.json({
+                        success: true,
+                        token: "Bearer " + token
                     })
-                } else {
-                    return res.status(400).json("密码错误！")
-                }
+                })
+            } else {
+                return res.status(400).json("密码错误！")
             }
-        })
+        }
+    })
 })
 
 // register api
 // $route POST api/users/register
 // @desc 是否登录成功
 router.post("/register", (req, res) => {
-    //查询数据库是否拥有该邮箱
-    User.findOne({email: req.body.email})
-        .then((user) => {
-            if (user) {
-                return res.status(400).json("邮箱已被注册");
-            } else {
-                const newUser = new User({
-                    account: req.body.account,
-                    email: req.body.email,
-                    password: req.body.password
-                });
-                newUser.save()
-                    .then(user =>  res.json(user))
-                    .catch(err => res.json(err));
-                // 加密密码
-                // bcrypt.genSalt(10, function (err, salt) {
-                //     bcrypt.hash(newUser.password, salt, (err, hash) => {
-                //         if (err) throw err;
-                //         newUser.password = hash;
-                //         newUser.save()
-                //             .then(user => res.json(user))
-                //             .catch(err => console.log(err))
-                //     })
-                // })
-            }
-        })
+    //查询数据库是否拥有该账户
+    User.findOne({account: req.body.account}).then((user) => {
+        console.log(user)
+        if (user) {
+            return res.status(400).json("该手机号已被注册");
+        } else {
+            new User({
+                account: req.body.account,
+                password: req.body.password
+            }).save().then(graph => res.json({graph}))
+        }
+    })
 })
 
 // authToken api 权限管理 验证token
@@ -92,8 +70,41 @@ router.get("/authToken", passport.authenticate("jwt", {session: false}), (req, r
     res.json({
         id: req.user.id,
         account: req.user.account,
-        email: req.user.email
     });
 })
+
+// 生成验证码
+router.get("/getCode", (req,res)=>{
+    let code = randomCode(6);//生成6位数字随机验证码
+    sendCode(Number(req.query.account), code, function(success) {
+        if(success){
+            res.json({msg: "短信验证码已发送"})
+            auths.push({
+                account: req.query.account,
+                code
+            })
+        }else{
+            res.status(400).json("发送失败")
+        }
+    })
+})
+
+// 核对验证码是否正确
+router.post("/checkCode", (req, res) => {
+    const index = auths.findIndex(item => item.account == req.body.account)
+    console.log(auths, index)
+    if (index !== -1) {
+        if (req.body.code == auths[index].code) {
+            res.json({msg: "验证成功"})
+            auths.splice(index, 1)
+        } else {
+            res.status(400).json("验证码错误")
+        }
+    } else {
+        res.status(400).json("网络错误")
+    }
+    
+})
+
 
 module.exports = router;
