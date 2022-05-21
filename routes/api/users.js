@@ -66,10 +66,7 @@ router.post("/register", (req, res) => {
 // @desc return authToken user
 // access Private
 router.get("/authToken", passport.authenticate("jwt", {session: false}), (req, res) => {
-    res.json({
-        id: req.user.id,
-        account: req.user.account,
-    });
+    res.json(req.user);
 })
 
 // 生成验证码
@@ -106,25 +103,42 @@ router.post("/checkCode", (req, res) => {
 })
 
 // 获取用户信息
-router.get("/getUserInfo/:account", (req,res)=>{
-    User.findOne({account: req.params.account}).then((user) => {
-        if (user) {
-            return res.json(user);
-        } else {
-            return res.status(400).json({msg: "暂无此人！"})
-        }
-    })
+router.get("/getUserInfo", (req, res)=>{
+    // verifyToken(req.headers.token).then(res => {
+    //     conosle.log(res)
+    // })
+    // User.findOne({account: req.params.account}).then((user) => {
+    //     if (user) {
+    //         return res.json(user);
+    //     } else {
+    //         return res.status(400).json({msg: "暂无此人！"})
+    //     }
+    // })
 })
+function verifyToken(token) {
+	return new Promise((resolve, reject) => {
+		jwt.verify(token, keys.secretOrKey, (error, result) => {
+            if(error){
+                reject(error)
+            } else {
+                resolve(result)
+            }
+		})
+	})
+}
+
 
 // 编辑用户信息
-router.post("/editUserInfo/:account", (req, res)=>{
+router.post("/edit",  passport.authenticate("jwt", {session: false}), (req, res)=>{
     const fields = {};
+    console.log(req.body)
     if (req.body.account) fields.account = req.body.account;
     if (req.body.password) fields.password = req.body.password;
     if (req.body.nickname) fields.nickname = req.body.nickname;
     if (req.body.avatar) fields.avatar = req.body.avatar;
-    Graph.findOneAndUpdate(
-        { id: req.params.account },
+    console.log(fields)
+    User.findOneAndUpdate(
+        { _id: req.user._id },
         { $set: fields },
         { new: true })
         .then(g => res.json(g))

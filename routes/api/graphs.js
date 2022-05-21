@@ -57,13 +57,12 @@ function compare (p) { //这是比较函数
 // @desc 获取具体某个graph
 // @access Public
 router.get("/:id", (req, res) => {
-    Graph.find({ id: req.params.id })
-        .then(g => {
-            if (!g) {
-                return res.status(200).json("没有任何内容");
-            }
-            res.json(g)
-        }).catch(err => res.status(404).json(err))
+    Graph.find({ id: req.params.id }).then(g => {
+        if (!g) {
+            return res.status(200).json("没有任何内容");
+        }
+        res.json(g)
+    }).catch(err => res.status(404).json(err))
 })
 
 // editOneGraph api
@@ -102,6 +101,28 @@ router.get("/delete/:id", (req, res) => {
             { new: true }).then(g => res.json(g))
     }
     
+})
+
+router.get("/clone/:id", (req, res) => {
+    Graph.find({ id: req.params.id }).then(g => {
+        if (!g) {
+            return res.status(200).json("没有任何内容");
+        }
+        const graphFields = {};
+        if (req.query.name) {
+            graphFields.name = req.query.name
+        } else {
+            graphFields.name = g[0].name
+        }
+        graphFields.info = g[0].info
+        graphFields.img = g[0].img
+        graphFields.id = uuid();
+        new Graph(graphFields).save().then(graph => {
+            res.json({
+                graph
+            })
+        })
+    }).catch(err => res.status(404).json(err))
 })
 
 // deleteGraphs api
