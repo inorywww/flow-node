@@ -50,7 +50,6 @@ router.post("/login", (req, res) => {
 router.post("/register", (req, res) => {
     //查询数据库是否拥有该账户
     User.findOne({account: req.body.account}).then((user) => {
-        console.log(user)
         if (user) {
             return res.status(400).json("该手机号已被注册");
         } else {
@@ -105,6 +104,32 @@ router.post("/checkCode", (req, res) => {
     }
     
 })
+
+// 获取用户信息
+router.get("/getUserInfo/:account", (req,res)=>{
+    User.findOne({account: req.params.account}).then((user) => {
+        if (user) {
+            return res.json(user);
+        } else {
+            return res.status(400).json({msg: "暂无此人！"})
+        }
+    })
+})
+
+// 编辑用户信息
+router.post("/editUserInfo/:account", (req, res)=>{
+    const fields = {};
+    if (req.body.account) fields.account = req.body.account;
+    if (req.body.password) fields.password = req.body.password;
+    if (req.body.nickname) fields.nickname = req.body.nickname;
+    if (req.body.avatar) fields.avatar = req.body.avatar;
+    Graph.findOneAndUpdate(
+        { id: req.params.account },
+        { $set: fields },
+        { new: true })
+        .then(g => res.json(g))
+})
+
 
 
 module.exports = router;

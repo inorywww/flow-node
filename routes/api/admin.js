@@ -9,12 +9,6 @@ const passport = require("passport");
 
 const User = require("../../models/User");
 
-router.post('/testPost',(req, res) => {
-    const account = req.body.account;
-    const password = req.body.password;
-    res.json(req.body);
-})
-
 // login api
 // $route POST api/users/login
 // @desc 返回token jwt passport

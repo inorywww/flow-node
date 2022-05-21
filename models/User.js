@@ -15,7 +15,14 @@ const UserSchema = new Schema({
         type: Number,
         default: Date.now()
     },
-    
+    avatar: {
+        type: String,
+        default: ''
+    },
+    nickname: {
+        type: String,
+        default: ''
+    },
 });
 
 module.exports = User = mongoose.model("users", UserSchema);
