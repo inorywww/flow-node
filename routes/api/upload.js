@@ -3,19 +3,19 @@ const router = express.Router();
 const multer = require("multer");
 const fs = require("fs");
 const imgDir = require("../../config/keys").imgDir; //图床位置
-const mdDir = require("../../config/keys").mdDir; //md文件位置
+const fileDir = require("../../config/keys").fileDir; //md文件位置
 
 let upload = multer({
     storage: multer.diskStorage({
         //设置文件存储位置
         destination: function (req, file, cb) {
-            let dir = '';
+            const dir = fileDir;
             //判断文件类型
-            if (file.originalname.split('.').pop() === 'md') {
-                dir = mdDir;
-            } else {
-                dir = imgDir;
-            }
+            // if (file.originalname.split('.').pop() === 'md') {
+            //     dir = fileDir;
+            // } else {
+            //     dir = imgDir;
+            // }
             //判断目录是否存在，没有则创建
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, {

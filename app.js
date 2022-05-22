@@ -18,8 +18,10 @@ app.use(express.urlencoded({ extended: false }))
 // import api
 const users = require("./routes/api/users");
 const graphs = require("./routes/api/graphs")
+const upload = require("./routes/api/upload")
 //use routes    
 app.use("/api/admin", users);
 app.use("/api/graphs", graphs);
+app.use("/api/upload", upload);
 
 module.exports = app;

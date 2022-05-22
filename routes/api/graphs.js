@@ -10,11 +10,12 @@ const { uuid } = require('uuidv4')
 // $route Get api/graphs/add
 // @desc 添加graph
 // @access Public
-router.get("/add", async (req, res) => {
+router.post("/add", async (req, res) => {
     const graphFields = {};
     graphFields.id = uuid();
     if (req.body.name) graphFields.name = req.body.name;
     if (req.body.info) graphFields.info = req.body.info;
+    if (req.body.types) graphFields.types = req.body.types;
     new Graph(graphFields).save().then(graph => {
         res.json({
             graph
@@ -76,6 +77,7 @@ router.post("/edit/:id", (req, res) => {
     if (req.body.name) fields.name = req.body.name;
     if (req.body.info) fields.info = req.body.info;
     if (req.body.img) fields.img = req.body.img;
+    if (req.body.types) fields.types = req.body.types;
     fields.is_del = req.body.is_del;
     Graph.findOneAndUpdate(
         { id: req.params.id },
@@ -116,6 +118,7 @@ router.get("/clone/:id", (req, res) => {
         }
         graphFields.info = g[0].info
         graphFields.img = g[0].img
+        graphFields.types = g[0].types
         graphFields.id = uuid();
         new Graph(graphFields).save().then(graph => {
             res.json({
