@@ -24,8 +24,11 @@ const GraphSchema = new Schema({
     default: 0, 
   },
   info: {
-    type: String,
-    default: ''
+    type: Object,
+    default: {
+      nodes: [],
+      edges: [],
+    }
   },
   img: {
     type: String,
