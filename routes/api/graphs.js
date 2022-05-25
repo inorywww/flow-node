@@ -10,7 +10,7 @@ const { uuid } = require('uuidv4')
 // $route Get api/graphs/add
 // @desc 添加graph
 // @access Public
-router.post("/add", async (req, res) => {
+router.post("/add", passport.authenticate("jwt", { session: false }), async (req, res) => {
     const graphFields = {};
     graphFields.id = uuid();
     if (req.body.name) graphFields.name = req.body.name;
@@ -27,7 +27,7 @@ router.post("/add", async (req, res) => {
 // $route GET api/graphs
 // @desc 获取所有graph
 // @access Public
-router.get("/", (req, res) => {
+router.get("/", passport.authenticate("jwt", { session: false }), (req, res) => {
     const type = req.query.type // 类型 0||null: 全部 1: 最近修改 2: 回收站
     Graph.find().then(g => {
         if (!g) {
@@ -57,7 +57,7 @@ function compare (p) { //这是比较函数
 // $route GET api/graph/:id
 // @desc 获取具体某个graph
 // @access Public
-router.get("/:id", (req, res) => {
+router.get("/:id", passport.authenticate("jwt", { session: false }), (req, res) => {
     Graph.find({ id: req.params.id }).then(g => {
         if (!g) {
             return res.status(200).json("没有任何内容");
@@ -71,7 +71,7 @@ router.get("/:id", (req, res) => {
 // @desc 编辑graph
 // @access Private
 // router.post("/edit/:id", passport.authenticate("jwt", { session: false }), (req, res) => {
-router.post("/edit/:id", (req, res) => {
+router.post("/edit/:id", passport.authenticate("jwt", { session: false }), (req, res) => {
     const fields = {};
     fields.recent_time = Date.now()
     if (req.body.name) fields.name = req.body.name;
@@ -91,7 +91,7 @@ router.post("/edit/:id", (req, res) => {
 // @desc 删除graph
 // @access Private
 // router.delete("/delete/:id", passport.authenticate("jwt", { session: false }), (req, res) => {
-router.get("/delete/:id", (req, res) => {
+router.get("/delete/:id", passport.authenticate("jwt", { session: false }), (req, res) => {
     if (req.query.is_del == 1) {
         Graph.findOneAndRemove({ id: req.params.id }).then(g => res.json(g)).catch(err => res.status(404).json("删除失败"))
     } else {
@@ -105,7 +105,7 @@ router.get("/delete/:id", (req, res) => {
     
 })
 
-router.get("/clone/:id", (req, res) => {
+router.get("/clone/:id", passport.authenticate("jwt", { session: false }), (req, res) => {
     Graph.find({ id: req.params.id }).then(g => {
         if (!g) {
             return res.status(200).json("没有任何内容");
@@ -133,7 +133,6 @@ router.get("/clone/:id", (req, res) => {
 // @desc 删除graph
 // @access Private
 router.get("/delete", (req, res) => {
-    console.log('delete')
     Graph.remove().then(g => {
         res.json(g);
     }).catch(err => res.status(404).json("删除失败"))
