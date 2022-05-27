@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
+const bodyParser = require('body-parser')
 
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
+app.use(bodyParser.json({limit: '50mb'}))
 // const utils = require('./utils'); //此次启动使用
 
 // passport 初始化 
