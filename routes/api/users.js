@@ -88,7 +88,6 @@ router.get("/getCode", (req,res)=>{
 // 核对验证码是否正确
 router.post("/checkCode", (req, res) => {
     const index = auths.findIndex(item => item.account == req.body.account)
-    console.log(auths, index)
     if (index !== -1) {
         if (req.body.code == auths[index].code) {
             res.json({msg: "验证成功"})

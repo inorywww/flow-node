@@ -1,16 +1,16 @@
-var md5 = require('blueimp-md5')
-var moment = require('moment')
-var Base64 = require('js-base64').Base64;
-var request = require('request');
+const md5 = require('blueimp-md5')
+const moment = require('moment')
+const Base64 = require('js-base64').Base64;
+const request = require('request');
 
 /*
 生成指定长度的随机数
  */
 function randomCode(length) {
-    var chars = ['0','1','2','3','4','5','6','7','8','9'];
-    var result = ""; //统一改名: alt + shift + R
-    for(var i = 0; i < length ; i ++) {
-        var index = Math.ceil(Math.random()*9);
+    const chars = ['0','1','2','3','4','5','6','7','8','9'];
+    const result = ""; //统一改名: alt + shift + R
+    for(let i = 0; i < length ; i ++) {
+        const index = Math.ceil(Math.random()*9);
         result += chars[index];
     }
     return result;
@@ -22,23 +22,22 @@ exports.randomCode = randomCode;
 向指定号码发送指定验证码
  */
 function sendCode(phone, code, callback) {
-    var ACCOUNT_SID = '8a216da8806f31ad0180ba25e2c910aa';
-    var AUTH_TOKEN = 'f9305348439c494b82dbe0e91719ce11';
-    var Rest_URL = 'https://app.cloopen.com:8883';
-    var AppID = '8a216da8806f31ad0180ba25e3ee10b1';
+    const ACCOUNT_SID = '8a216da8806f31ad0180ba25e2c910aa';
+    const AUTH_TOKEN = 'f9305348439c494b82dbe0e91719ce11';
+    const Rest_URL = 'https://app.cloopen.com:8883';
+    const AppID = '8a216da8806f31ad0180ba25e3ee10b1';
     //1. 准备请求url
     /*
     1.使用MD5加密（账户Id + 账户授权令牌 + 时间戳）。其中账户Id和账户授权令牌根据url的验证级别对应主账户。
     时间戳是当前系统时间，格式"yyyyMMddHHmmss"。时间戳有效时间为24小时，如：20140416142030
     2.SigParameter参数需要大写，如不能写成sig=abcdefg而应该写成sig=ABCDEFG
      */
-    var sigParameter = '';
-    var time = moment().format('YYYYMMDDHHmmss');
-    sigParameter = md5(ACCOUNT_SID+AUTH_TOKEN+time);
+    const time = moment().format('YYYYMMDDHHmmss');
+    const sigParameter = md5(ACCOUNT_SID+AUTH_TOKEN + time);
     var url = Rest_URL+'/2013-12-26/Accounts/'+ACCOUNT_SID+'/SMS/TemplateSMS?sig='+sigParameter;
 
     //2. 准备请求体
-    var body = {
+    const body = {
         to : phone,
         appId : AppID,
         templateId : '1',
@@ -52,9 +51,9 @@ function sendCode(phone, code, callback) {
     2.冒号为英文冒号
     3.时间戳是当前系统时间，格式"yyyyMMddHHmmss"，需与SigParameter中时间戳相同。
      */
-    var authorization = ACCOUNT_SID + ':' + time;
+    let authorization = ACCOUNT_SID + ':' + time;
     authorization = Base64.encode(authorization);
-    var headers = {
+    const headers = {
         'Accept' :'application/json',
         'Content-Type' :'application/json;charset=utf-8',
         'Content-Length': JSON.stringify(body).length+'',
